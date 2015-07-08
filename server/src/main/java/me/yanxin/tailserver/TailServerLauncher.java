@@ -15,15 +15,31 @@ public class TailServerLauncher {
 		config.setPort(9092);
 
 		final SocketIOServer server = new SocketIOServer(config);
+		long delay = 500;
 
 		File file = new File("/Users/yanxingong/Documents/test.txt");
-
 		MyTailerListener listener = new MyTailerListener("message", server);
+		final Tailer tailer = new Tailer(file, listener, delay);
+
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			/*
+			 * Secure adresse
+			 * 
+			 * (non-Javadoc)
+			 * 
+			 * @see java.lang.Thread#run()
+			 */
+			public void run() {
+				System.out.println("Terminating tailer amd socket.io server");
+				tailer.stop();
+				server.stop();
+			}
+		});
 
 		server.start();
-		Tailer tailer = new Tailer(file, listener);
+
 		tailer.run();
-		//
+
 		Thread.sleep(Integer.MAX_VALUE);
 
 		server.stop();
