@@ -20,7 +20,7 @@ public class PropertiesLoader {
 	 * 
 	 */
 	public static void loadFichiersProperties() {
-		properties = getInstance()._loadProperties(PROPERTIES_FILES);
+		setProperties(getInstance()._loadProperties(PROPERTIES_FILES));
 	}
 
 	private Properties _loadProperties(String pFilepath) {
@@ -40,5 +40,13 @@ public class PropertiesLoader {
 							+ pFilepath);
 		}
 		return properties;
+	}
+
+	public static Properties getProperties() {
+		return properties;
+	}
+
+	public static void setProperties(Properties properties) {
+		PropertiesLoader.properties = properties;
 	}
 }
