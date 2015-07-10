@@ -1,12 +1,17 @@
 package me.yanxin.tailserver;
 
 import org.apache.commons.io.input.TailerListenerAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.corundumstudio.socketio.SocketIOServer;
 
 public class MyTailerListener extends TailerListenerAdapter {
 	private SocketIOServer socketIOServer;
 	private String eventName = "message";
+
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(MyTailerListener.class);
 
 	public MyTailerListener(String eventName, SocketIOServer server) {
 		super();
@@ -24,7 +29,7 @@ public class MyTailerListener extends TailerListenerAdapter {
 
 	@Override
 	public void handle(String line) {
-		System.out.println("new line:" + line);
+		LOGGER.debug("new line: " + line);
 		if (socketIOServer != null) {
 			socketIOServer.getBroadcastOperations().sendEvent(eventName, line);
 		}

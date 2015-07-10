@@ -5,6 +5,8 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SimpleHttpServerLauncher implements Runnable {
 
@@ -12,8 +14,14 @@ public class SimpleHttpServerLauncher implements Runnable {
 
 	private String baseDir;
 
+	private int port;
+
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(SimpleHttpServerLauncher.class);
+
 	public SimpleHttpServerLauncher(int port, String baseDir) {
 		this.baseDir = baseDir;
+		this.port = port;
 		httpServer = new Server(port);
 	}
 
@@ -41,13 +49,17 @@ public class SimpleHttpServerLauncher implements Runnable {
 		try {
 			httpServer.start();
 		} catch (Exception e) {
+			LOGGER.error("Starting http server on port" + this.port
+					+ "failed. Please see details.", e);
 			e.printStackTrace();
 			httpServer.destroy();
 		}
 		try {
 			httpServer.join();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			LOGGER.error(
+					"Http server has a problem during excution. Please see details.",
+					e);
 			httpServer.destroy();
 		}
 	}

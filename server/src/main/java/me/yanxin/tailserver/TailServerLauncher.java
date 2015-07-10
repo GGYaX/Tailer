@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.Properties;
 
 import org.apache.commons.io.input.Tailer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOServer;
@@ -11,6 +13,8 @@ import com.corundumstudio.socketio.SocketIOServer;
 public class TailServerLauncher {
 
 	public static Properties properties;
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(TailServerLauncher.class);
 
 	public static String SOCKET_IO_SERVER_HOST;
 	public static int SOCKET_IO_SERVER_PORT;
@@ -59,6 +63,7 @@ public class TailServerLauncher {
 				HTTP_SERVER_PORT, HTTP_SERVER_BASE_DIR);
 		Thread httpServerThread = new Thread(httpServer);
 		httpServerThread.setDaemon(true);
+		LOGGER.info("Starting http server on port " + HTTP_SERVER_PORT);
 		httpServerThread.start();
 
 		Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -70,13 +75,15 @@ public class TailServerLauncher {
 			 * @see java.lang.Thread#run()
 			 */
 			public void run() {
-				System.out.println("Terminating tailer amd socket.io server");
+				LOGGER.info("Terminating tailer amd socket.io server");
 				tailer.stop();
 				socketIOServer.stop();
 				httpServer.stop();
 			}
 		});
 
+		LOGGER.info("Starting socket io server on port "
+				+ SOCKET_IO_SERVER_PORT);
 		socketIOServer.start();
 
 		tailer.run();
