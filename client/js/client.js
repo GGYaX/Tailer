@@ -1,9 +1,9 @@
 var divBegin = '<div>';
 var divEnd = '</div>';
 var defaultPatterns = {
-	'Error':'text-danger',
-	'Debug':'text-info',
-	'Exception':'text-warning'
+	'Error': 'text-danger',
+	'Debug': 'text-info',
+	'Exception': 'text-warning'
 };
 var logDiv = $('#logDiv');
 
@@ -37,14 +37,15 @@ function addNewLine(line) {
 
 function colorLine(line) {
 	var patterns = readPattern();
-	for(var pattern in patterns) {
-		line = divBegin + line.replace(new RegExp(pattern, 'ig'), '<font class="' + defaultPatterns[pattern] + '">' + pattern + '</font>') + divEnd;
+	for (var pattern in patterns) {
+		line = divBegin + line.replace(new RegExp(pattern, 'ig'), '<font class="' +
+			defaultPatterns[pattern] + '">' + pattern + '</font>') + divEnd;
 	}
 	return line;
 };
 
 function turnToJqueryObjet(whoami) {
-	if(whoami instanceof jQuery) {
+	if (whoami instanceof jQuery) {
 		return whoami;
 	}
 	return $(whoami);
