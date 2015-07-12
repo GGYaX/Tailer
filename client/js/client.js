@@ -20,7 +20,7 @@ $(document).ready(function() {
 
 	socket.on('connect', function() {
 		addNewLine('Client connect to server');
-	})
+	});
 
 	socket.on('init', function(data) {
 		addToConfg(data);
@@ -29,7 +29,7 @@ $(document).ready(function() {
 
 	socket.on('disconnect', function() {
 		addNewLine('Client disconnect from server');
-	})
+	});
 });
 
 function addToConfg(config) {
@@ -75,11 +75,16 @@ function loadTabAndContent(config) {
 }
 
 function initOnMessage(config) {
-	var toEval = ''
+	var events = [];
 	for (var filename in config) {
-		toEval += socketioOnTemplate.replace(/toreplace1/ig, filename);
+		events.push(filename);
 	}
-	eval(toEval);
+	for (var i in events)
+		(function(e) {
+			socket.on(e, function(data) {
+				addNewLine(data, logDetailArrays[e]);
+			});
+		})(events[i]);
 }
 
 function readPattern(argument) {
