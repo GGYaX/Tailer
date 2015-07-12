@@ -6,9 +6,15 @@ var defaultPatterns = {
 	'Exception': 'text-warning'
 };
 var logDiv = $('#logDiv');
+var logDetailDivTemplate =
+	'<div role="tabpanel" class="tab-pane fade" id="toreplace1">toreplace2</div>';
+var tabTemplate =
+	'<li role="presentation"><a href="#toreplace1" aria-controls="toreplace1" role="tab" data-toggle="tab">toreplace1</a></li>';
+var logDetailArrays = {};
+var socket;
 
 $(document).ready(function() {
-	var socket = io.connect('http://localhost:9092');
+	socket = io.connect('http://localhost:9092');
 
 	socket.on('connect', function() {
 		addNewLine('Client connect to server');
@@ -18,10 +24,49 @@ $(document).ready(function() {
 		addNewLine(data);
 	});
 
+	socket.on('init', function(data) {
+		addToConfg(data);
+		init();
+	});
+
 	socket.on('disconnect', function() {
 		addNewLine('Client disconnect from server');
 	})
 });
+
+function addToConfg(config) {
+	$('#tabConfig').text(config);
+}
+
+function init() {
+	var pText = $('#tabConfig').text();
+	var configJSON = JSON.parse(pText);
+	initTabAndContent(configJSON);
+	initOnMessage(configJSON);
+}
+
+function initTabAndContent(config) {
+	// parse p element
+
+	var $myTab = $('#myTab');
+	var $myContent = $('#myContent');
+	for (var filename in config) {
+		var $tabToAppend = $(tabTemplate.replace(/toreplace1/g, filename));
+		$myTab.append($tabToAppend);
+		var $divToAppend = $(logDetailDivTemplate.replace(/toreplace1/g, filename).replace(
+			/toreplace2/, 'Reading ' + config[filename]));
+		$myContent.append($divToAppend);
+		logDetailArrays[filename] = $divToAppend;
+	}
+}
+
+function initOnMessage(config) {
+	for (var filename in config) {
+		socket.on(filename, function(data) {
+			addNewLine(data, logDetailArrays[filename]);
+		})
+	}
+}
 
 function readPattern(argument) {
 	// read a json from a no display p
@@ -29,10 +74,11 @@ function readPattern(argument) {
 	return defaultPatterns;
 };
 
-function addNewLine(line) {
+function addNewLine(line, toElement) {
 	// we set a default pattern
 	var coloredLine = colorLine(line);
-	logDiv.append(turnToJqueryObjet(coloredLine));
+	if (!toElement) toElement = logDiv;
+	toElement.append(turnToJqueryObjet(coloredLine));
 };
 
 function colorLine(line) {

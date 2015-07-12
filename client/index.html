@@ -7,16 +7,25 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 	<!-- Optional theme -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 	
 </head>
 <body>
-	<div id="container">
-		<div class="row">
-			<input type="text" placeHolder>
-		</div>
-		<div class="row">
-			<div class="col-lg-12" id="logDiv">
-				
+	<p style="display:none" id="tabConfig"></p>
+	<div id="container" class="container-fluid">
+		<!-- Nav tabs -->
+		<ul class="nav nav-tabs" role="tablist" id="myTab">
+			<li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
+		</ul>
+
+		<!-- Tab panes -->
+		<div class="tab-content" id="myContent">
+			<div role="tabpanel" class="tab-pane fade in active" id="home">
+				<div class="row">
+					<div class="col-lg-12" id="logDiv">
+
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -26,4 +35,5 @@
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 <script src="js/client.js"></script>
+<script src="js/lib.js"></script>
 </html>
