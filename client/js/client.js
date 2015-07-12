@@ -10,6 +10,8 @@ var logDetailDivTemplate =
 	'<div role="tabpanel" class="tab-pane fade" id="toreplace1">toreplace2</div>';
 var tabTemplate =
 	'<li role="presentation"><a href="#toreplace1" aria-controls="toreplace1" role="tab" data-toggle="tab">toreplace1</a></li>';
+var socketioOnTemplate =
+	'socket.on("toreplace1",function(data){addNewLine(data,logDetailArrays["toreplace1"])});'
 var logDetailArrays = {};
 var socket;
 
@@ -19,10 +21,6 @@ $(document).ready(function() {
 	socket.on('connect', function() {
 		addNewLine('Client connect to server');
 	})
-
-	socket.on('message', function(data) {
-		addNewLine(data);
-	});
 
 	socket.on('init', function(data) {
 		addToConfg(data);
@@ -39,13 +37,29 @@ function addToConfg(config) {
 }
 
 function init() {
+	// initTab();
+	// initContent();
 	var pText = $('#tabConfig').text();
 	var configJSON = JSON.parse(pText);
-	initTabAndContent(configJSON);
+	loadTabAndContent(configJSON);
 	initOnMessage(configJSON);
 }
 
-function initTabAndContent(config) {
+function initTab(argument) {
+	var initialTab =
+		'<ul class="nav nav-tabs" role="tablist" id="myTab"><li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li></ul>';
+	var $tab = $('#myTab');
+	$tab.replaceWith(initialTab);
+}
+
+function initContent(argument) {
+	var initialCotent =
+		'<div class="tab-content" id="myContent"><div role="tabpanel" class="tab-pane fade in active" id="home"><div class="row"><div class="col-lg-12" id="logDiv"></div></div></div></div>';
+	var $content = $('#myContent');
+	$content.replaceWith(initialCotent);
+}
+
+function loadTabAndContent(config) {
 	// parse p element
 
 	var $myTab = $('#myTab');
@@ -61,11 +75,11 @@ function initTabAndContent(config) {
 }
 
 function initOnMessage(config) {
+	var toEval = ''
 	for (var filename in config) {
-		socket.on(filename, function(data) {
-			addNewLine(data, logDetailArrays[filename]);
-		})
+		toEval += socketioOnTemplate.replace(/toreplace1/ig, filename);
 	}
+	eval(toEval);
 }
 
 function readPattern(argument) {

@@ -8,7 +8,7 @@ import com.corundumstudio.socketio.SocketIOServer;
 
 public class MyTailerListener extends TailerListenerAdapter {
 	private SocketIOServer socketIOServer;
-	private String eventName = "message";
+	private String eventName;
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(MyTailerListener.class);
@@ -29,8 +29,9 @@ public class MyTailerListener extends TailerListenerAdapter {
 
 	@Override
 	public void handle(String line) {
-		LOGGER.debug("new line: " + line);
+		LOGGER.info("new line: " + line);
 		if (socketIOServer != null) {
+			LOGGER.info("Broadcasting to room: " + eventName);
 			socketIOServer.getBroadcastOperations().sendEvent(eventName, line);
 		}
 	}
