@@ -1,4 +1,6 @@
-package me.yanxin.tailserver;
+package me.yanxin.tailserver.process;
+
+import me.yanxin.tailserver.TailServerConfiguration;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -8,7 +10,12 @@ import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SimpleHttpServerLauncher implements Runnable {
+public class HttpServerServiceProcess implements ProcessInterface {
+
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(HttpServerServiceProcess.class);
+
+	private volatile boolean running = true;
 
 	private Server httpServer;
 
@@ -16,18 +23,24 @@ public class SimpleHttpServerLauncher implements Runnable {
 
 	private int port;
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(SimpleHttpServerLauncher.class);
-
-	public SimpleHttpServerLauncher(int port, String baseDir) {
-		this.baseDir = baseDir;
-		this.port = port;
+	public HttpServerServiceProcess() {
+		this.baseDir = TailServerConfiguration.HTTP_SERVER_BASE_DIR;
+		this.port = TailServerConfiguration.HTTP_SERVER_PORT;
 		httpServer = new Server(port);
 	}
 
 	@Override
-	public void run() {
+	public void terminate() throws Exception {
+		if (httpServer != null && httpServer.isStarted()) {
+			httpServer.stop();
+			httpServer.destroy();
+		}
+		LOGGER.debug("HttpServer terminated");
+		setRunning(false);
+	}
 
+	@Override
+	public void run() {
 		/*
 		 * File server configuration [BEGIN]
 		 */
@@ -42,36 +55,28 @@ public class SimpleHttpServerLauncher implements Runnable {
 		handlers.setHandlers(new Handler[] { resource_handler,
 				new DefaultHandler() });
 		httpServer.setHandler(handlers);
-
 		/*
 		 * File server configuration [END]
 		 */
 		try {
+
 			httpServer.start();
+			LOGGER.debug("HttpServer running...");
+		} catch (InterruptedException e) {
+			LOGGER.error("Thread interrupted. See for more details :", e);
+			setRunning(false);
 		} catch (Exception e) {
 			LOGGER.error("Starting http server on port" + this.port
 					+ "failed. Please see details.", e);
-			e.printStackTrace();
-			httpServer.destroy();
-		}
-		try {
-			httpServer.join();
-		} catch (InterruptedException e) {
-			LOGGER.error(
-					"Http server has a problem during excution. Please see details.",
-					e);
-			httpServer.destroy();
+			setRunning(false);
 		}
 	}
 
-	public void stop() {
-		try {
-			httpServer.stop();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			httpServer.destroy();
-		}
+	public boolean isRunning() {
+		return running;
 	}
 
+	public void setRunning(boolean running) {
+		this.running = running;
+	}
 }
