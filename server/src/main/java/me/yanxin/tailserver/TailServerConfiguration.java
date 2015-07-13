@@ -14,8 +14,6 @@ public class TailServerConfiguration {
 	private static Properties properties;
 	public static String SOCKET_IO_SERVER_HOST;
 	public static int SOCKET_IO_SERVER_PORT;
-	// TODO to delete
-	public static String SERVER_MESSAGE_ROOM1;
 	public static long TAILER_DELAY;
 	public static int HTTP_SERVER_PORT;
 	public static String HTTP_SERVER_BASE_DIR;
@@ -53,7 +51,6 @@ public class TailServerConfiguration {
 				.getProperty("default.socketio.port"));
 		TAILER_DELAY = Long.parseLong(properties
 				.getProperty("default.tailer.delay"));
-		SERVER_MESSAGE_ROOM1 = properties.getProperty("default.socketio.room1");
 		HTTP_SERVER_PORT = Integer.parseInt(properties
 				.getProperty("default.httpserver.port"));
 		HTTP_SERVER_BASE_DIR = properties
