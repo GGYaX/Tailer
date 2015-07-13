@@ -29,9 +29,9 @@ public class MyTailerListener extends TailerListenerAdapter {
 
 	@Override
 	public void handle(String line) {
-		LOGGER.info("new line: " + line);
+		LOGGER.debug("new line: " + line);
 		if (socketIOServer != null) {
-			LOGGER.info("Broadcasting to room: " + eventName);
+			LOGGER.debug("Broadcasting to room: " + eventName);
 			socketIOServer.getBroadcastOperations().sendEvent(eventName, line);
 		}
 	}
