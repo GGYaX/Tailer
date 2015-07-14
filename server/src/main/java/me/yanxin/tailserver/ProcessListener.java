@@ -1,4 +1,6 @@
-package me.yanxin.tailserver.process;
+package me.yanxin.tailserver;
+
+import me.yanxin.tailserver.process.ProcessInterface;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
