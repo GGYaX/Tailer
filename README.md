@@ -24,6 +24,14 @@ Compile
 
 Next version
 ----------
+- improve client side
+	- add clean log button
+	- add custom coloring
+
+Backlog
+----------
 - add features like `tail -500f`
+
+- client side : add custom files.json
 
 - add packing in `pom.xml`
