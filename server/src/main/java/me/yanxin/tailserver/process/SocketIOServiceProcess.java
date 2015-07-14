@@ -34,7 +34,7 @@ public class SocketIOServiceProcess implements ProcessInterface {
 	@Override
 	public void terminate() throws Exception {
 		socketIOServer.stop();
-		LOGGER.debug("Socket IO Server terminated.");
+		LOGGER.debug("Socket IO Server Service terminated.");
 		setRunning(false);
 	}
 
@@ -50,10 +50,12 @@ public class SocketIOServiceProcess implements ProcessInterface {
 		});
 
 		socketIOServer.start();
+		LOGGER.debug("Socket IO Server Service running.");
 	}
 
 	public void broadcast(String eventName, Object data) {
 		if (isRunning()) {
+			LOGGER.debug("Broadcasting to room: " + eventName);
 			socketIOServer.getBroadcastOperations().sendEvent(eventName, data);
 		}
 	}

@@ -35,7 +35,7 @@ public class HttpServerServiceProcess implements ProcessInterface {
 			httpServer.stop();
 			httpServer.destroy();
 		}
-		LOGGER.debug("HttpServer terminated");
+		LOGGER.debug("Http Server Service terminated");
 		setRunning(false);
 	}
 
@@ -61,7 +61,7 @@ public class HttpServerServiceProcess implements ProcessInterface {
 		try {
 
 			httpServer.start();
-			LOGGER.debug("HttpServer running...");
+			LOGGER.debug("Http Server Service running...");
 		} catch (InterruptedException e) {
 			LOGGER.error("Thread interrupted. See for more details :", e);
 			setRunning(false);
