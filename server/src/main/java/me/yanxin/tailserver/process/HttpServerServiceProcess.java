@@ -15,7 +15,7 @@ public class HttpServerServiceProcess implements ProcessInterface {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(HttpServerServiceProcess.class);
 
-	private volatile boolean running = true;
+	private volatile boolean running = false;
 
 	private Server httpServer;
 
@@ -35,8 +35,8 @@ public class HttpServerServiceProcess implements ProcessInterface {
 			httpServer.stop();
 			httpServer.destroy();
 		}
-		LOGGER.debug("Http Server Service terminated");
 		setRunning(false);
+		LOGGER.debug("Http Server Service terminated");
 	}
 
 	@Override
@@ -61,6 +61,7 @@ public class HttpServerServiceProcess implements ProcessInterface {
 		try {
 
 			httpServer.start();
+			setRunning(true);
 			LOGGER.debug("Http Server Service running...");
 		} catch (InterruptedException e) {
 			LOGGER.error("Thread interrupted. See for more details :", e);
@@ -72,6 +73,7 @@ public class HttpServerServiceProcess implements ProcessInterface {
 		}
 	}
 
+	@Override
 	public boolean isRunning() {
 		return running;
 	}

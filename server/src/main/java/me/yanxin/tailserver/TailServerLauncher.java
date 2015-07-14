@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.yanxin.tailserver.process.HttpServerServiceProcess;
+import me.yanxin.tailserver.process.ProcessInterface;
 import me.yanxin.tailserver.process.SocketIOServiceProcess;
 import me.yanxin.tailserver.process.TailServiceProcess;
 
@@ -19,6 +20,15 @@ public class TailServerLauncher {
 	public static List<TailServiceProcess> listTailServiceProcesses = new ArrayList<TailServiceProcess>();
 
 	public static List<Tailer> tailServices = new ArrayList<Tailer>();
+
+	private static boolean allServiceRunning(
+			ProcessInterface... processInterfaces) {
+		boolean running = true;
+		for (ProcessInterface processInterface : processInterfaces) {
+			running = running && processInterface.isRunning();
+		}
+		return running;
+	}
 
 	public static void main(String[] args) throws Exception {
 		TailServerConfiguration.load();
@@ -58,11 +68,6 @@ public class TailServerLauncher {
 		 * Starting Tail Service[END]
 		 */
 
-		LOGGER.info("Server is fully running on port "
-				+ TailServerConfiguration.HTTP_SERVER_PORT
-				+ "see in http://localhost:"
-				+ TailServerConfiguration.HTTP_SERVER_PORT + "/client");
-
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			/*
 			 * Secure adresse
@@ -79,5 +84,20 @@ public class TailServerLauncher {
 				LOGGER.info("Server is down.");
 			}
 		});
+
+		/*
+		 * Check server status
+		 */
+		while (!allServiceRunning(httpServerServiceProcess,
+				socketIOServiceProcess, tailServiceProcess)) {
+
+			Thread.currentThread();
+			Thread.sleep(1000);
+		}
+		LOGGER.info("Server is fully running on port "
+				+ TailServerConfiguration.HTTP_SERVER_PORT
+				+ ". See in http://localhost:"
+				+ TailServerConfiguration.HTTP_SERVER_PORT + "/client");
+
 	}
 }

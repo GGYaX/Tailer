@@ -17,7 +17,7 @@ public class SocketIOServiceProcess implements ProcessInterface {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(SocketIOServiceProcess.class);
 
-	private volatile boolean running = true;
+	private volatile boolean running = false;
 
 	private SocketIOServer socketIOServer;
 
@@ -34,8 +34,8 @@ public class SocketIOServiceProcess implements ProcessInterface {
 	@Override
 	public void terminate() throws Exception {
 		socketIOServer.stop();
-		LOGGER.debug("Socket IO Server Service terminated.");
 		setRunning(false);
+		LOGGER.debug("Socket IO Server Service terminated.");
 	}
 
 	@Override
@@ -50,6 +50,7 @@ public class SocketIOServiceProcess implements ProcessInterface {
 		});
 
 		socketIOServer.start();
+		setRunning(true);
 		LOGGER.debug("Socket IO Server Service running.");
 	}
 
@@ -57,6 +58,8 @@ public class SocketIOServiceProcess implements ProcessInterface {
 		if (isRunning()) {
 			LOGGER.debug("Broadcasting to room: " + eventName);
 			socketIOServer.getBroadcastOperations().sendEvent(eventName, data);
+		} else {
+			LOGGER.debug("Socket io not running.");
 		}
 	}
 
@@ -72,10 +75,8 @@ public class SocketIOServiceProcess implements ProcessInterface {
 		}
 	}
 
+	@Override
 	public boolean isRunning() {
-		if (!running) {
-			LOGGER.debug("Socket io not running.");
-		}
 		return running;
 	}
 

@@ -6,8 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import me.yanxin.tailserver.TailerHandler;
 import me.yanxin.tailserver.TailServerConfiguration;
+import me.yanxin.tailserver.TailerHandler;
 
 import org.apache.commons.io.input.Tailer;
 import org.slf4j.Logger;
@@ -20,7 +20,7 @@ public class TailServiceProcess implements ProcessInterface {
 
 	private static List<Tailer> TAILERS = new ArrayList<Tailer>();
 
-	private volatile boolean running = true;
+	private volatile boolean running = false;
 
 	public TailServiceProcess(SocketIOServiceProcess socketIOServiceProcess) {
 		// Tailer server
@@ -46,8 +46,8 @@ public class TailServiceProcess implements ProcessInterface {
 		for (Tailer tailer : TAILERS) {
 			tailer.stop();
 		}
-		LOGGER.debug("Tail Serivce terminated.");
 		setRunning(false);
+		LOGGER.debug("Tail Serivce terminated.");
 	}
 
 	@Override
@@ -57,9 +57,11 @@ public class TailServiceProcess implements ProcessInterface {
 			thread.setDaemon(true);
 			thread.start();
 		}
+		setRunning(true);
 		LOGGER.debug("Tail Service running.");
 	}
 
+	@Override
 	public boolean isRunning() {
 		return running;
 	}
