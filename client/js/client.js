@@ -7,13 +7,22 @@ var defaultPatterns = {
 };
 var logDiv = $('#logDiv');
 var logDetailDivTemplate =
-	'<div role="tabpanel" class="tab-pane fade" id="toreplace1">toreplace2</div>';
+	'<p style="display:none;" id="toreplace1LineNumber">0</p><div role="tabpanel" class="tab-pane fade" id="toreplace1">toreplace2</div>';
 var tabTemplate =
 	'<li role="presentation"><a href="#toreplace1" aria-controls="toreplace1" role="tab" data-toggle="tab">toreplace1</a></li>';
 var socketioOnTemplate =
 	'socket.on("toreplace1",function(data){addNewLine(data,logDetailArrays["toreplace1"])});'
 var logDetailArrays = {};
 var socket;
+var atBottom = true;
+
+$(window).scroll(function() {
+	if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+		atBottom = true;
+	} else {
+		atBottom = false;
+	}
+});
 
 $(document).ready(function() {
 	socket = io.connect('http://localhost:9092');
@@ -40,9 +49,9 @@ function init() {
 	// initTab();
 	// initContent();
 	var pText = $('#tabConfig').text();
-	var configJSON = JSON.parse(pText);
-	loadTabAndContent(configJSON);
-	initOnMessage(configJSON);
+	var filesToTail = JSON.parse(pText);
+	loadTabAndContent(filesToTail);
+	initOnMessage(filesToTail);
 }
 
 function initTab(argument) {
@@ -94,19 +103,26 @@ function readPattern(argument) {
 };
 
 function addNewLine(line, toElement) {
+
 	// we set a default pattern
 	var coloredLine = colorLine(line);
 	if (!toElement) toElement = logDiv;
+	var LineNumber = parseInt(toElement.prev().text());
+	if (LineNumber >= 500) {
+		// remove the first element inside
+		toElement.find(':first-child').remove();
+	}
 	toElement.append(turnToJqueryObjet(coloredLine));
+	if (atBottom) gotoBottom();
 };
 
 function colorLine(line) {
 	var patterns = readPattern();
 	for (var pattern in patterns) {
-		line = divBegin + line.replace(new RegExp(pattern, 'ig'), '<font class="' +
-			defaultPatterns[pattern] + '">' + pattern + '</font>') + divEnd;
+		line = line.replace(new RegExp(pattern, 'ig'), '<font class="' +
+			defaultPatterns[pattern] + '">' + pattern + '</font>');
 	}
-	return line;
+	return divBegin + line + divEnd;
 };
 
 function turnToJqueryObjet(whoami) {
@@ -115,3 +131,7 @@ function turnToJqueryObjet(whoami) {
 	}
 	return $(whoami);
 };
+
+function gotoBottom() {
+	$(window).scrollTop($(document).height());
+}
