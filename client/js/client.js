@@ -25,7 +25,10 @@ $(window).scroll(function() {
 });
 
 $(document).ready(function() {
-	socket = io.connect('http://localhost:9092');
+	var url = window.location.href;
+	var domain = (url.split('/')[2]).split(':')[0];
+
+	socket = io.connect('http://' + domain + ':9092');
 
 	socket.on('connect', function() {
 		addNewLine('Client connect to server');
