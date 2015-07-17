@@ -6,8 +6,10 @@ var defaultPatterns = {
 	'Exception': 'text-warning'
 };
 var logDiv = $('#logDiv');
+var logDetailPTemplate = '<p style="display:none;" id="toreplace1LineNumber">0</p>';
 var logDetailDivTemplate =
-	'<p style="display:none;" id="toreplace1LineNumber">0</p><div role="tabpanel" class="tab-pane fade" id="toreplace1">toreplace2</div>';
+	'<div role="tabpanel" class="tab-pane fade" id="toreplace1">toreplace2</div>';
+var logDetailTemplate = logDetailPTemplate + logDetailDivTemplate;
 var tabTemplate =
 	'<li role="presentation"><a href="#toreplace1" aria-controls="toreplace1" role="tab" data-toggle="tab">toreplace1</a></li>';
 var socketioOnTemplate =
@@ -15,6 +17,15 @@ var socketioOnTemplate =
 var logDetailArrays = {};
 var socket;
 var atBottom = true;
+var entityMap = {
+	"&": "&amp;",
+	"<": "&lt;",
+	">": "&gt;",
+	'"': '&quot;',
+	"'": '&#39;',
+	"/": '&#x2F;'
+};
+
 
 $(window).scroll(function() {
 	if ($(window).scrollTop() + $(window).height() == $(document).height()) {
@@ -79,10 +90,11 @@ function loadTabAndContent(config) {
 	for (var filename in config) {
 		var $tabToAppend = $(tabTemplate.replace(/toreplace1/g, filename));
 		$myTab.append($tabToAppend);
-		var $divToAppend = $(logDetailDivTemplate.replace(/toreplace1/g, filename).replace(
+		var $templateToAppend = $(logDetailTemplate.replace(/toreplace1/g, filename).replace(
 			/toreplace2/, 'Reading ' + config[filename]));
-		$myContent.append($divToAppend);
-		logDetailArrays[filename] = $divToAppend;
+		$myContent.append($templateToAppend);
+		$divContent = $('[id="'+ filename +'"]');
+		logDetailArrays[filename] = $divContent;
 	}
 }
 
@@ -108,16 +120,29 @@ function readPattern(argument) {
 function addNewLine(line, toElement) {
 
 	// we set a default pattern
-	var coloredLine = colorLine(line);
+	var coloredLine = colorLine(escapeHtml(line));
 	if (!toElement) toElement = logDiv;
 	var LineNumber = parseInt(toElement.prev().text());
 	if (LineNumber >= 500) {
 		// remove the first element inside
 		toElement.find(':first-child').remove();
 	}
+	plusLineNumber(toElement.prev());
 	toElement.append(turnToJqueryObjet(coloredLine));
 	if (atBottom) gotoBottom();
 };
+
+function plusLineNumber(element) {
+	var LineNumber = parseInt(element.text());
+	LineNumber ++;
+	element.text(LineNumber);
+}
+
+function minusLineNumber (element) {
+	var LineNumber = parseInt(element.text());
+	LineNumber --;
+	element.text(LineNumber);
+}
 
 function colorLine(line) {
 	var patterns = readPattern();
@@ -137,4 +162,10 @@ function turnToJqueryObjet(whoami) {
 
 function gotoBottom() {
 	$(window).scrollTop($(document).height());
+}
+
+function escapeHtml(string) {
+return String(string).replace(/[&<>"'\/]/g, function (s) {
+  return entityMap[s];
+});
 }
